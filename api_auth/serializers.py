@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username','first_name', 'last_name', 'email', 'password', 'password2']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'password2']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, attrs):
@@ -33,15 +33,12 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+# SERIALIZER EMAIL RECOVER PASSWORD
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
 
-class PasswordResetConfirmSerializer(serializers.Serializer):
-    new_password = serializers.CharField(max_length=128)
-    re_new_password = serializers.CharField(max_length=128)
-
-
+# SERIALIZER RESET PASSWORD OLD
 class ChangePasswordSerializer(serializers.Serializer):
     model = User
 

@@ -29,6 +29,7 @@ pip-delete-this-directory.txt
 # Pycharm project files
 .idea/
 
+.env
 # PyTest cache
 .pytest_cache/
 

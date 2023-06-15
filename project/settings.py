@@ -12,14 +12,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rua3^48_s+lsv@pumj1@$_l$)=z#n#ka5u_dqtrh-d=us)@hwl'
+SECRET_KEY = config('SECRET_KEY', str)
 
-DEBUG = True
+DEBUG = config('DEBUG', bool)
 
 ALLOWED_HOSTS = ['*']
 
-
-DOMAIN = '127.0.0.1:8000'
+DOMAIN = config('DOMAIN', str)
 
 
 # Application definition
@@ -72,7 +71,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': config("ENGINE", str),
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
@@ -127,26 +126,28 @@ REST_FRAMEWORK = {
 }
 
 
-SECRET_KEY_JWT = 'ASDOAODHOAHDOHAOSDHIAGUIDGAIOHODJA'
+
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60), # DURAÇÃO TOKEN DE ACESSO
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1), # DURAÇÃO TOKEN REFRESH
     "BLACKLIST_AFTER_ROTATION": False,
 
-    "SIGNING_KEY": SECRET_KEY_JWT,
+    "SIGNING_KEY": config('SECRET_KEY_JWT', str),
     "AUTH_HEADER_TYPES": ("Bearer",),
    
 }
 
 
+# EMAIL 
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# if DEBUG:
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# DEFAULT_FROM_EMAIL = 'caiocsilva97@gmail.com'
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST_USER = 'caiocsilva97@gmail.com'
-# EMAIL_HOST_PASSWORD = 'bywkuxzvmnqndrym'
-# EMAIL_USE_TLS = True
-# EMAIL_PORT = 587
-# EMAIL_HOST = 'smtp.gmail.com'
+    DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+    EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+    EMAIL_USE_TLS = config('EMAIL_USE_TLS')
+    EMAIL_PORT = config('EMAIL_PORT')
+    EMAIL_HOST = config('EMAIL_HOST')
