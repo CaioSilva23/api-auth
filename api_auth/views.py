@@ -33,6 +33,7 @@ class UserRegistrationView(APIView):
 
 
 class ChangePasswordView(generics.UpdateAPIView):
+
     """
     An endpoint for changing password.
     """
@@ -74,7 +75,7 @@ class PasswordResetView(APIView):
             user = User.objects.filter(email=email).first()
             if user:
                 send_email(user=user)
-                return Response(status=status.HTTP_200_OK)
+                return Response(data={"Success": "Redefinição de senha enviado para o seu email."},status=status.HTTP_200_OK)
             else:
                 return Response({'Error': 'Email not found.'}, status=status.HTTP_404_NOT_FOUND)
 
