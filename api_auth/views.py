@@ -4,13 +4,10 @@ from .serializers import UserSerializer
 from rest_framework import status
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.views import PasswordResetView as DjangoPasswordResetView, PasswordResetConfirmView as DjangoPasswordResetConfirmView
-from django.core.mail import send_mail
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import PasswordResetSerializer, PasswordResetConfirmSerializer
-from django.template.loader import get_template
+from .serializers import PasswordResetSerializer
 from django.conf import settings
 from django.urls import reverse
 from django.template.loader import render_to_string
@@ -49,7 +46,7 @@ class PasswordResetView(APIView):
             if associated_users.exists():
                 for user in associated_users:
                     resert_password_url = self._generate_url(user=user)
-                    subject = "Ative sua conta na EDIV..."
+                    subject = "Reset password"
                     mail_body = render_to_string('mail/reset_password.html', {'url': resert_password_url})
                     email = EmailMessage(subject, mail_body, to=[user.email])
                     if email.send():
@@ -64,18 +61,18 @@ class PasswordResetView(APIView):
 
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
-from django.contrib.auth import get_user_model
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib import messages
-from .utils import strong_password
 import re
 from django.shortcuts import redirect
 
+
 def password_account(request, uid64, token):
+    uid = force_str(urlsafe_base64_decode(uid64))
+    user = User.objects.filter(pk=uid)
+
     if request.method == 'GET':
-        uid = force_str(urlsafe_base64_decode(uid64))
-        user = User.objects.filter(pk=uid)
         if (user := user.first()) and default_token_generator.check_token(user, token):
             return render(request, 'reset.html')
     
@@ -96,4 +93,10 @@ def password_account(request, uid64, token):
             'possuir pelo menos uma letra minuscula, '
             'uma letra maiúscula e um número')
             return url
-        return HttpResponse('Senha válida')
+        if (user := user.first()) and default_token_generator.check_token(user, token):
+            user.set_password(password)
+            user.save()
+            return HttpResponse('Salvo')
+
+
+    

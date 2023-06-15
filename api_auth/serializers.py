@@ -51,6 +51,8 @@ class UserSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError("As senhas não coincidem.")
+        if User.objects.filter(email=attrs['email']).exists():
+            raise serializers.ValidationError("Usuário com este email já existe!")
         # strong_password(attrs['password'])
         return attrs
 
