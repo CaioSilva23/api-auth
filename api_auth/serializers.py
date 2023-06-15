@@ -1,32 +1,3 @@
-# from rest_framework import serializers
-# from django.contrib.auth.models import User
-# from .utils import strong_password
-
-
-# class UsuarioSerializer(serializers.ModelSerializer):
-#     email = serializers.EmailField()
-#     password = serializers.CharField(validators=[strong_password],)
-
-#     class Meta:
-#         model = User
-#         fields = ('username','email', 'password')
-
-#     def create(self, validated_data):
-#         user = super().create(validated_data)
-#         user.set_password(validated_data['password'])
-#         user.save()
-        
-#         return user
-    
-#     password2 = serializers.SerializerMethodField(
-#         method_name='password2',
-
-#     )
-
-#     def password2(self, password2):
-#         print(password2)
-
-
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .utils import strong_password
@@ -69,3 +40,13 @@ class PasswordResetSerializer(serializers.Serializer):
 class PasswordResetConfirmSerializer(serializers.Serializer):
     new_password = serializers.CharField(max_length=128)
     re_new_password = serializers.CharField(max_length=128)
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
+
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
