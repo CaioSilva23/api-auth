@@ -18,19 +18,25 @@ from .serializers import ChangePasswordSerializer
 from rest_framework.permissions import IsAuthenticated 
 
 
-class UserRegistrationView(APIView):
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                'user': serializer.data,
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class UserRegistrationView(APIView):
+#     def post(self, request):
+#         serializer = UserSerializer(data=request.data)
+#         if serializer.is_valid():
+#             user = serializer.save()
+#             refresh = RefreshToken.for_user(user)
+#             return Response({
+#                 'user': serializer.data,
+#                 'refresh': str(refresh),
+#                 'access': str(refresh.access_token),
+#             }, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class UserRegistrationView(generics.ListCreateAPIView):
+    query_set = User.objects.all()
+    serializer_class = UserSerializer
+    
+    
 
 class ChangePasswordView(generics.UpdateAPIView):
 
@@ -88,7 +94,7 @@ def password_account(request, uid64, token):
 
     if request.method == 'GET':
         if (user := user.first()) and default_token_generator.check_token(user, token):
-            return render(request, 'mail/reset_confirm.html')
+            return render(request, 'mail/reset_confirm.html')  
     
     elif request.method == 'POST':
         password = request.POST.get('password')
@@ -110,4 +116,4 @@ def password_account(request, uid64, token):
         if (user := user.first()) and default_token_generator.check_token(user, token):
             user.set_password(password)
             user.save()
-            return HttpResponse('Salvo')
+            return HttpResponse('Senha alterada com sucesso!')

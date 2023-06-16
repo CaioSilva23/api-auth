@@ -35,6 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 # SERIALIZER EMAIL RECOVER PASSWORD
 class PasswordResetSerializer(serializers.Serializer):
+    model = User
     email = serializers.EmailField()
 
 
