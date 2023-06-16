@@ -11,5 +11,4 @@ def strong_password(password):
             'possuir pelo menos uma letra minuscula, '
             'uma letra maiúscula e um número'
         ),
-            code='invalid'
-        )
+            code='invalid')
