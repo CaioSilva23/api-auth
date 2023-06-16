@@ -44,7 +44,7 @@ class UserDetailAPI(generics.RetrieveUpdateAPIView):
 
 class UserUpdateAPI(APIView):
     """
-    An endpoint for update user .
+    An endpoint for update user.
     """
     def get(self, request, pk, format=None):
         user = get_object_or_404(User, pk=pk)
