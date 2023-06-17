@@ -13,15 +13,16 @@ urlpatterns = [
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Snippets API",
+      title="Auth Portfólio API",
       default_version='v1',
-      description="Test description",
+      description="Auth Portfólio API",
       terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
+      contact=openapi.Contact(email="caio_ceac23@hotmail.com"),
       license=openapi.License(name="BSD License"),
    ),
    public=True,
    permission_classes=[permissions.AllowAny],
+   url='http://127.0.0.1:8000/redoc/'
 )
 
 urlpatterns += [

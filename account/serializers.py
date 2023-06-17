@@ -76,7 +76,7 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
             user = User.objects.get(email=email)
             uid = urlsafe_base64_encode(force_bytes(user.id))
             token = PasswordResetTokenGenerator().make_token(user)
-            link = 'http://localhost:3000/api/user/reset-password/'+uid+'/'+token  # noqa: E501
+            link = 'http://localhost:8000/api/user/reset-password/'+uid+'/'+token  # noqa: E501
             print(link)
             # Send EMail
             body = 'Click Following Link to Reset Your Password '+link
@@ -106,6 +106,7 @@ class UserPasswordResetSerializer(serializers.Serializer):
             token = self.context.get('token')
             if password != password2:
                 raise serializers.ValidationError("Password and Confirm Password doesn't match")  # noqa: E501
+            strong_password
             id = smart_str(urlsafe_base64_decode(uid))
             user = User.objects.get(id=id)
             if not PasswordResetTokenGenerator().check_token(user, token):

@@ -11,6 +11,8 @@ from django.contrib.auth import authenticate
 from account.renderers import UserRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import CreateAPIView, GenericAPIView
+from account.models import User
 
 
 # Generate token manually
@@ -23,11 +25,16 @@ def get_tokens_for_user(user):
     }
 
 
-class UserRegistrationAPI(APIView):
+class UserRegistrationAPI(CreateAPIView):
+    """
+    An endpoint for register user.
+    """
     renderer_classes = [UserRenderer]
+    serializer_class = UserRegistrationSerializer
+    queryset = User.objects.all()
 
-    def post(self, request, format=None):
-        serializer = UserRegistrationSerializer(data=request.data)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         token = get_tokens_for_user(user=user)
@@ -36,11 +43,15 @@ class UserRegistrationAPI(APIView):
                 status=status.HTTP_201_CREATED)
 
 
-class UserLoginAPI(APIView):
+class UserLoginAPI(GenericAPIView):
+    """
+    An endpoint for login user.
+    """
     renderer_classes = [UserRenderer]
+    serializer_class = UserLoginSerializer
 
     def post(self, request, format=None):
-        serializer = UserLoginSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.data.get('email')
         password = serializer.data.get('password')
@@ -54,45 +65,59 @@ class UserLoginAPI(APIView):
                 status=status.HTTP_404_NOT_FOUND)
 
 
-class UserProfileAPI(APIView):
+class UserProfileAPI(GenericAPIView):
+    """
+    An endpoint for profile user.
+    """
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
+    serializer_class = UserProfileSerializer
 
     def get(self, request, format=None):
-        serializer = UserProfileSerializer(instance=request.user)
+        serializer = self.get_serializer(instance=request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UserChangePasswordView(APIView):
+class UserChangePasswordView(GenericAPIView):
+    """
+    An endpoint for change password.
+    """
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
+    serializer_class = UserChangePasswordSerializer
 
-    def post(self, request, format=None):
-        serializer = UserChangePasswordSerializer(
-                        data=request.data,
-                        context={'user': request.user})
+    def put(self, request, format=None):
+        serializer = self.get_serializer(data=request.data, context={'user': request.user})
         serializer.is_valid(raise_exception=True)
         return Response(
                 data={'msg': 'Password Changed Successfully'},
                 status=status.HTTP_200_OK)
 
 
-class SendPasswordResetEmailView(APIView):
+class SendPasswordResetEmailView(GenericAPIView):
+    """
+     An endpoint to change the password via email.
+    """
     renderer_classes = [UserRenderer]
+    serializer_class = SendPasswordResetEmailSerializer
 
     def post(self, request, format=None):
-        serializer = SendPasswordResetEmailSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(
                 data={'msg': 'Password Reset link send. Please check your Email'},  # noqa: E501
                 status=status.HTTP_200_OK)
 
 
-class UserPasswordResetView(APIView):
+class UserPasswordResetView(GenericAPIView):
+    """
+     An endpoint to reset the password.
+    """
     renderer_classes = [UserRenderer]
+    serializer_class = UserPasswordResetSerializer
 
-    def post(self, request, uid, token, format=None):
-        serializer = UserPasswordResetSerializer(
+    def put(self, request, uid, token, format=None):
+        serializer = self.get_serializer(
                                         data=request.data,
                                         context={'uid': uid, 'token': token})
         serializer.is_valid(raise_exception=True)
