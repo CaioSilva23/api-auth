@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from account.models import User
 from account.utils import strong_password, Util
-from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError  # noqa: E501
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import smart_str, DjangoUnicodeDecodeError  # noqa: E501
+from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 
@@ -74,18 +74,7 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
         email = attrs.get('email')
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
-            uid = urlsafe_base64_encode(force_bytes(user.id))
-            token = PasswordResetTokenGenerator().make_token(user)
-            link = 'http://localhost:8000/api/user/reset-password/'+uid+'/'+token  # noqa: E501
-            print(link)
-            # Send EMail
-            body = 'Click Following Link to Reset Your Password '+link
-            data = {
-                'subject': 'Reset Your Password',
-                'body': body,
-                'to_email': user.email
-            }
-            Util.send_email(data)
+            Util.send_email(user=user)
             return attrs
         else:
             raise serializers.ValidationError('You are not a Registered User')
@@ -106,7 +95,7 @@ class UserPasswordResetSerializer(serializers.Serializer):
             token = self.context.get('token')
             if password != password2:
                 raise serializers.ValidationError("Password and Confirm Password doesn't match")  # noqa: E501
-            strong_password
+            strong_password(password=password)
             id = smart_str(urlsafe_base64_decode(uid))
             user = User.objects.get(id=id)
             if not PasswordResetTokenGenerator().check_token(user, token):

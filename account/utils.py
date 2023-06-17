@@ -2,6 +2,12 @@ import re
 from rest_framework import serializers
 from django.core.mail import EmailMessage
 import os
+from django.urls import reverse
+from account.models import User
+from django.utils.encoding import force_bytes 
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.conf import settings
 
 
 def strong_password(password):
@@ -40,12 +46,24 @@ def cpf_validate(numbers):
 
 
 class Util:
-    @staticmethod
-    def send_email(data):
+    @classmethod
+    def send_email(cls, user: User):
+        link = cls.generate_url(user=user)
+        print('lindk TERMINAL ', link)
+        body = 'Click Following Link to Reset Your Password '+link
         email = EmailMessage(
-                subject=data['subject'],
-                body=data['body'],
+                subject='Reset Your Password',
+                body=body,
                 from_email=os.environ.get('DEFAULT_FROM_EMAIL'),
-                to=[data['to_email']]
+                to=[user.email]
                 )
         email.send()
+
+    @classmethod
+    def generate_url(cls, user: User):
+        protocol = 'http' if settings.DEBUG else 'https'
+        domain = settings.DOMAIN
+        uid = urlsafe_base64_encode(force_bytes(user.id))
+        token = PasswordResetTokenGenerator().make_token(user)
+        url = f"{protocol}://{domain}{reverse('reset-password', kwargs={'uid': uid, 'token': token})}"  # noqa: E501
+        return url

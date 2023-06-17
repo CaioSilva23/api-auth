@@ -10,13 +10,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6gdjz(dedmx5%xmu3qrzs#gy^$jd&vo0lx_+mic!i+w)c%)!o3'  # noqa: E501
+SECRET_KEY = 'django-insecure-6gdjz(dedmx5%xmu3qrzs#gy^$jd&vo0lx_+mic!i+w)c%)!o3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+DOMAIN = '127.0.0.1:8000'
 
 # Application definition
 
@@ -111,9 +112,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-BR'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
@@ -151,11 +152,12 @@ SIMPLE_JWT = {
 
 PASSWORD_RESET_TIMEOUT = 900  # 900sec = 15 Min
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:8000",
+#     "http://127.0.0.1:8000",
+# ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 
 # EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
