@@ -151,6 +151,10 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 }
 
+SWAGGER_SETTINGS = {
+    "base_path": 'https://api-auth.up.railway.app/',
+}
+
 PASSWORD_RESET_TIMEOUT = 900  # 900sec = 15 Min
 
 # CORS_ALLOWED_ORIGINS = [
