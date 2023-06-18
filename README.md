@@ -2,21 +2,21 @@
 Authentication REST API for a portfolio site
 
 ## Install
-1 - Primeiro clone o repositório e entre na pasta do projeto.
+1 - First clone the repository and enter the project folder.
 ```bash
   $ git clone https://github.com/CaioSilva23/api-auth
   $ cd api-auth
 ```
-2 - Segundo inicie um ambiente virtual
+2 - Second start a virtual environment
 ```bash
   $ python3 -m venv venv
   $ source venv/bin/activate
 ```
-3 - Instale as dependências
+3 - Install the dependencies
 ```bash
   $ pip3 install -r requirements.txt
 ```
-4 - Faça as migrações.
+4 - Do the migrations
 ```bash
   python3 manage.py migrate
 ```
