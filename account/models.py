@@ -47,7 +47,7 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
     # cpf = models.CharField(
-    #     max_length=11, 
+    #     max_length=11,
     #     unique=True,
     #     validators=[cpf_validate],
     #     error_messages={

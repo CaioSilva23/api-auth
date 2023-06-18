@@ -4,7 +4,7 @@ from django.core.mail import EmailMessage
 import os
 from django.urls import reverse
 from account.models import User
-from django.utils.encoding import force_bytes 
+from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.conf import settings
@@ -20,6 +20,7 @@ def strong_password(password):
             'uma letra maiúscula e um número'
         ),
             code='invalid')
+
 
 # VALIDADOR DE CPF
 def cpf_validate(numbers):
@@ -49,7 +50,6 @@ class Util:
     @classmethod
     def send_email(cls, user: User):
         link = cls.generate_url(user=user)
-        print('lindk TERMINAL ', link)
         body = 'Click Following Link to Reset Your Password '+link
         email = EmailMessage(
                 subject='Reset Your Password',
