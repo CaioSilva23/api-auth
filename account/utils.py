@@ -61,9 +61,9 @@ class Util:
 
     @classmethod
     def generate_url(cls, user: User):
-        protocol = 'http' if settings.DEBUG else 'https'
+        # protocol = 'http' if settings.DEBUG else 'https'
         domain = settings.DOMAIN
         uid = urlsafe_base64_encode(force_bytes(user.id))
         token = PasswordResetTokenGenerator().make_token(user)
-        url = f"{protocol}://{domain}{reverse('reset-password', kwargs={'uid': uid, 'token': token})}"  # noqa: E501
+        url = f"{domain}{reverse('reset-password', kwargs={'uid': uid, 'token': token})}"  # noqa: E501
         return url
