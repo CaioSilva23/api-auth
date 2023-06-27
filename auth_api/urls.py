@@ -25,7 +25,7 @@ schema_view = get_schema_view(
    ),
    public=True,
    permission_classes=[permissions.AllowAny],
-   url='https://api-auth.up.railway.app/'
+   # url='https://api-auth.up.railway.app/'
 )
 
 urlpatterns += [
