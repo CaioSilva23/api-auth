@@ -178,8 +178,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://api-auth.up.railway.app",
 ]
 
-
-
 CORS_ALLOW_ALL_ORIGINS = True
 
 # EMAIL
