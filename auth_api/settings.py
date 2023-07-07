@@ -175,7 +175,7 @@ PASSWORD_RESET_TIMEOUT = 900  # 900sec = 15 Min
 # ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://api-auth.up.railway.app",
+    "https://auth-api.up.railway.app",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
