@@ -9,6 +9,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.views.static import serve
 
+print(settings.DEBUG)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,7 +27,7 @@ schema_view = get_schema_view(
    ),
    public=True,
    permission_classes=[permissions.AllowAny],
-   url='https://auth-api.up.railway.app/'
+   # url='https://auth-api.up.railway.app/'
 )
 
 urlpatterns += [
