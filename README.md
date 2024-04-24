@@ -7,27 +7,15 @@ Authentication REST API for a portfolio site
   $ git clone https://github.com/CaioSilva23/api-auth
   $ cd api-auth
 ```
-2 - Second start a virtual environment
+2 - Configure environment variables
 ```bash
-  $ python3 -m venv venv
-  $ source venv/bin/activate
+ create .env based on .env-exemple
 ```
-3 - Install the dependencies
+3 - Second start docker compose
 ```bash
-  $ pip3 install -r requirements.txt
+  $ docker compose up
 ```
-4 - Do the migrations
-```bash
-  python3 manage.py migrate
-```
-## Run the app
-```bash
-  $ python3 manage.py runserver
-```
-## Run the tests
-```bash
-  $ python3 manage.py test
-```
+
 ## Register a new User
 
 ### Example Request
