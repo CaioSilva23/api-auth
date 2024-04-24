@@ -3,16 +3,11 @@ FROM python:3.8
 WORKDIR /app
 
 COPY requirements.txt /app/
-
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . /app/
+COPY ./scripts/entrypoint.sh /entrypoint.sh
 
-# Definindo permissõe do script
-RUN chmod +x /app/scripts/entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-EXPOSE 8000
-
-# Comando para executar o servidor Django
-CMD ["/app/scripts/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
