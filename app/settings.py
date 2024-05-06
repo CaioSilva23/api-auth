@@ -19,7 +19,6 @@ ALLOWED_HOSTS = ['*']
 DOMAIN = os.environ.get('DOMAIN')
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -27,12 +26,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'drf_yasg',
+    'account',
     "corsheaders",
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework_swagger',
-    'account',
+    'drf_spectacular',
+    # 'account',
 ]
 
 MIDDLEWARE = [
@@ -46,7 +45,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'auth_api.urls'
+ROOT_URLCONF = 'app.urls'
 
 TEMPLATES = [
     {
@@ -64,30 +63,29 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'auth_api.wsgi.application'
+WSGI_APPLICATION = 'app.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-# if DEBUG:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
-# else:
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get("PGDATABASE"),
-        'USER': os.environ.get("PGUSER"),
-        'PASSWORD': os.environ.get("PGPASSWORD"),
-        'HOST': os.environ.get("PGHOST"),
-        'PORT': int(os.environ.get("PGPORT")),
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ.get("PGDATABASE"),
+            'USER': os.environ.get("PGUSER"),
+            'PASSWORD': os.environ.get("PGPASSWORD"),
+            'HOST': os.environ.get("PGHOST"),
+            'PORT': int(os.environ.get("PGPORT")),
+        }
+    }
 
 AUTH_USER_MODEL = "account.User"
 
@@ -96,8 +94,16 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Auth Portfólio API',
+    'DESCRIPTION': 'Auth Portfólio API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
 }
 
 
@@ -145,6 +151,7 @@ DISABLE_COLLECTSTATIC = os.environ.get('DISABLE_COLLECTSTATIC')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = 'account.User'
 
 # Default JWT
 SIMPLE_JWT = {
@@ -164,22 +171,6 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 }
 
-SWAGGER_SETTINGS = {
-    "base_path": 'localhost',
-}
-
-PASSWORD_RESET_TIMEOUT = 900  # 900sec = 15 Min
-
-# CORS_ALLOWED_ORIGINS = [
-#     "https://api-auth.up.railway.app",
-#     "http://127.0.0.1:8000",
-# ]
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://auth-api.up.railway.app",
-]
-
-CORS_ALLOW_ALL_ORIGINS = True
 
 # EMAIL
 if DEBUG:

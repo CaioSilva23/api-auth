@@ -1,34 +1,48 @@
+"""
+Django admin custom.
+"""
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from account.models import User
+from django.utils.translation import gettext_lazy as _
+
+from account import models
 
 
-class UserModelAdmin(BaseUserAdmin):
-    # The fields to be used in displaying the User model.
-    # These override the definitions on the base UserModelAdmin
-    # that reference specific fields on auth.User.
-    list_display = ["id", "email", "get_full_name", "is_admin"]
-    list_filter = ["is_admin"]
-    fieldsets = [
-        ('User Credentials', {"fields": ["email", "password"]}),
-        ("Personal info", {"fields": ["first_name", 'last_name']}),
-        ("Permissions", {"fields": ["is_admin"]}),
-    ]
-    # add_fieldsets is not a standard ModelAdmin attribute. UserModelAdmin
-    # overrides get_fieldsets to use this attribute when creating a user.
-    add_fieldsets = [
+class UserAdmin(BaseUserAdmin):
+    """Define the admin pages for users."""
+    ordering = ['id']
+    list_display = ['email', 'name']
+    fieldsets = (
+        (None, {
+            'fields': ('email', 'password')}),
         (
-            None,
+            _('Permissions'),
             {
-                "classes": ["wide"],
-                "fields": ["email", "first_name","last_name", "password1", "password2"],
-            },
+                'fields': (
+                    'is_active',
+                    'is_staff',
+                    'is_superuser',
+                )
+            }
         ),
-    ]
-    search_fields = ["email"]
-    ordering = ["email", "id"]
-    filter_horizontal = []
+        (_('Important dates'), {'fields': ('last_login',)}),
+    )
+    readonly_fields = ['last_login']
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': (
+                'email',
+                'password1',
+                'password2',
+                'name',
+                'is_active',
+                'is_staff',
+                'is_superuser',
+            )
+        }),
+    )
 
 
-# Now register the new UserModelAdmin...
-admin.site.register(User, UserModelAdmin)
+
+admin.site.register(models.User, UserAdmin)

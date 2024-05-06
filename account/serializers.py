@@ -1,3 +1,7 @@
+"""
+Serializer for user.
+"""
+
 from rest_framework import serializers
 from account.models import User
 from account.utils import strong_password, Util
@@ -7,30 +11,31 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    # We are writing this becoz we need confirm password field in our Registratin Request  # noqa: E501
-    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)  # noqa: E501
+    """User serializer registration"""
+    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name', 'password', 'password2']
+        fields = ['email', 'name', 'password', 'password2']
         extra_kwargs = {
             'password': {'write_only': True}
             }
 
-    # Validating Password and Confirm Password while Registration
     def validate(self, attrs):
         password = attrs.get('password')
         password2 = attrs.get('password2')
         if password != password2:
-            raise serializers.ValidationError("Password and Confirm Password doesn't match")  # noqa: E501
+            raise serializers.ValidationError("Password and Confirm Password doesn't match")
         strong_password(password)
         return attrs
 
     def create(self, validate_data):
+        del validate_data['password2']
         return User.objects.create_user(**validate_data)
 
 
 class UserLoginSerializer(serializers.ModelSerializer):
+    """User serializer login"""
     email = serializers.EmailField(max_length=255)
 
     class Meta:
@@ -39,32 +44,43 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-
+    """User serializer profile"""
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name']
+        fields = ['id', 'email', 'name']
 
 
 class UserChangePasswordSerializer(serializers.Serializer):
-    password = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)  # noqa: E501
-    password2 = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)  # noqa: E501
+    """User serializer chance password"""
+    old_password = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)
+    new_password = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)
+    new_password2 = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)
 
     class Meta:
-        fields = ['password', 'password2']
+        fields = ['old_password', 'new_password', 'new_password2']
 
     def validate(self, attrs):
-        password = attrs.get('password')
-        password2 = attrs.get('password2')
+        old_password = attrs.get('old_password')
+        new_password = attrs.get('new_password')
+        new_password2 = attrs.get('new_password2')
+
         user = self.context.get('user')
-        if password != password2:
-            raise serializers.ValidationError("Password and Confirm Password doesn't match")  # noqa: E501
-        strong_password(password)
-        user.set_password(password)
+
+        if not user.check_password(old_password):
+            raise serializers.ValidationError("Incorrect old password")
+
+        if new_password != new_password2:
+            raise serializers.ValidationError("Password and Confirm Password doesn't match")
+
+        strong_password(new_password)
+
+        user.set_password(new_password)
         user.save()
         return attrs
 
 
 class SendPasswordResetEmailSerializer(serializers.Serializer):
+    """User serializer reset password"""
     email = serializers.EmailField(max_length=255)
 
     class Meta:
@@ -72,37 +88,18 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         email = attrs.get('email')
-        if User.objects.filter(email=email).exists():
-            user = User.objects.get(email=email)
-            Util.send_email(user=user)
+        user = User.objects.filter(email=email)
+
+        if user.exists():
+            user = user.first()
+            temp = Util.generate_temp_password()
+            success = Util.send_email(
+                user=user,
+                new_password=temp)
+
+            if success is True:
+                user.set_password(temp)
+                user.save()
             return attrs
         else:
             raise serializers.ValidationError('You are not a Registered User')
-
-
-class UserPasswordResetSerializer(serializers.Serializer):
-    password = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)  # noqa: E501
-    password2 = serializers.CharField(max_length=255, style={'input_type': 'password'}, write_only=True)  # noqa: E501
-
-    class Meta:
-        fields = ['password', 'password2']
-
-    def validate(self, attrs):
-        try:
-            password = attrs.get('password')
-            password2 = attrs.get('password2')
-            uid = self.context.get('uid')
-            token = self.context.get('token')
-            if password != password2:
-                raise serializers.ValidationError("Password and Confirm Password doesn't match")  # noqa: E501
-            strong_password(password=password)
-            id = smart_str(urlsafe_base64_decode(uid))
-            user = User.objects.get(id=id)
-            if not PasswordResetTokenGenerator().check_token(user, token):
-                raise serializers.ValidationError('Token is not Valid or Expired')  # noqa: E501
-            user.set_password(password)
-            user.save()
-            return attrs
-        except DjangoUnicodeDecodeError as identifier:
-            PasswordResetTokenGenerator().check_token(user, token)
-            raise serializers.ValidationError('Token is not Valid or Expired')

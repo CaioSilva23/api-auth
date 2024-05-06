@@ -1,9 +1,11 @@
-import re
+import re, os, random, string
+
 from rest_framework import serializers
-from django.core.mail import EmailMessage
-import os
-from django.urls import reverse
+
 from account.models import User
+
+from django.core.mail import EmailMessage
+from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -48,16 +50,23 @@ def cpf_validate(numbers):
 
 class Util:
     @classmethod
-    def send_email(cls, user: User):
-        link = cls.generate_url(user=user)
-        body = 'Click Following Link to Reset Your Password '+link
-        email = EmailMessage(
-                subject='Reset Your Password',
-                body=body,
-                from_email=os.environ.get('DEFAULT_FROM_EMAIL'),
-                to=[user.email]
-                )
-        email.send()
+    def send_email(cls, user: User, new_password: string) -> None:
+        try:
+            body = 'New Password ' + new_password
+            email = EmailMessage(
+                    subject='Reset Your Password',
+                    body=body,
+                    from_email=os.environ.get('DEFAULT_FROM_EMAIL'),
+                    to=[user.email]
+                    )
+            email.send()
+        except Exception:
+            raise serializers.ValidationError((
+                'Internal Error'
+            ),
+                code='invalid')
+        return True
+
 
     @classmethod
     def generate_url(cls, user: User):
@@ -67,3 +76,8 @@ class Util:
         token = PasswordResetTokenGenerator().make_token(user)
         url = f"{domain}{reverse('reset-password', kwargs={'uid': uid, 'token': token})}"  # noqa: E501
         return url
+
+    @classmethod
+    def generate_temp_password(cls):
+        chars = string.ascii_letters + string.digits
+        return ''.join(random.choice(chars) for _ in range(8))

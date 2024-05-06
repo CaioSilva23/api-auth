@@ -4,8 +4,7 @@ from account.serializers import UserRegistrationSerializer,\
                                 UserLoginSerializer, \
                                 UserProfileSerializer, \
                                 UserChangePasswordSerializer, \
-                                SendPasswordResetEmailSerializer, \
-                                UserPasswordResetSerializer
+                                SendPasswordResetEmailSerializer
 from django.contrib.auth import authenticate
 from account.renderers import UserRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -19,7 +18,6 @@ def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
 
     return {
-        'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
 
@@ -52,15 +50,17 @@ class UserLoginAPI(GenericAPIView):
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.data.get('email')
-        password = serializer.data.get('password')
+
+        email = serializer.data.get('email', "")
+        password = serializer.data.get('password', "")
+
         user = authenticate(email=email, password=password)
         if user is not None:
             token = get_tokens_for_user(user=user)
-            return Response({'token': token, 'msg': 'Login success'}, status=status.HTTP_200_OK)  # noqa: E501
+            return Response({'token': token, 'success': 'Login success'}, status=status.HTTP_200_OK)
         else:
             return Response(
-                data={'erros': {'non_field_errors': ['Email or Password is not valid']}},  # noqa: E501
+                data={'error': 'Email or Password is not valid'},
                 status=status.HTTP_404_NOT_FOUND)
 
 
@@ -93,7 +93,7 @@ class UserChangePasswordView(GenericAPIView):
                 status=status.HTTP_200_OK)
 
 
-class SendPasswordResetEmailView(GenericAPIView):
+class PasswordResetEmailView(GenericAPIView):
     """
      An endpoint to change the password via email.
     """
@@ -104,22 +104,5 @@ class SendPasswordResetEmailView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(
-                data={'msg': 'Password Reset link send. Please check your Email'},  # noqa: E501
+                data={'success': 'New password has been sent to your email'},
                 status=status.HTTP_200_OK)
-
-
-class UserPasswordResetView(GenericAPIView):
-    """
-     An endpoint to reset the password.
-    """
-    renderer_classes = [UserRenderer]
-    serializer_class = UserPasswordResetSerializer
-
-    def put(self, request, uid, token, format=None):
-        serializer = self.get_serializer(
-                                        data=request.data,
-                                        context={'uid': uid, 'token': token})
-        serializer.is_valid(raise_exception=True)
-        return Response(
-                    data={'msg': 'Password Reset Successfully'},
-                    status=status.HTTP_200_OK)
