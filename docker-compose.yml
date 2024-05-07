@@ -18,11 +18,6 @@ services:
     volumes:
       - ./app:/app
       - static:/static
-    environment:
-      - DB_HOST=db
-      - DB_NAME=postgres
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
     depends_on:
       - db
 
