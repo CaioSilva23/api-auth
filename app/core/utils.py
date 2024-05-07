@@ -2,7 +2,7 @@ import re, os, random, string
 
 from rest_framework import serializers
 
-from account.models import User
+from core.models import User
 
 from django.core.mail import EmailMessage
 from django.urls import reverse

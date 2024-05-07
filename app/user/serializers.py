@@ -3,8 +3,8 @@ Serializer for user.
 """
 
 from rest_framework import serializers
-from account.models import User
-from account.utils import strong_password, Util
+from core.models import User
+from core.utils import strong_password, Util
 from django.utils.encoding import smart_str, DjangoUnicodeDecodeError  # noqa: E501
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
