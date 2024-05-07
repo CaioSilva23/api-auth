@@ -10,16 +10,14 @@ services:
     ports:
       - "5432:5432"
 
-  app:
+  django_gunicorn:
     build:
       context: .
     ports:
       - "8000:8000"
     volumes:
       - ./app:/app
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+      - static:/static
     environment:
       - DB_HOST=db
       - DB_NAME=postgres
@@ -28,5 +26,35 @@ services:
     depends_on:
       - db
 
+  nginx:
+    build: ./nginx
+    volumes:
+      - static:/static
+    ports:
+      - "80:80"
+    depends_on:
+      - django_gunicorn
+
+
+
+  # app:
+  #   build:
+  #     context: .
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - ./app:/app
+  #   command: >
+  #     sh -c "python manage.py migrate &&
+  #            python manage.py runserver 0.0.0.0:8000"
+  #   environment:
+  #     - DB_HOST=db
+  #     - DB_NAME=postgres
+  #     - DB_USER=postgres
+  #     - DB_PASSWORD=postgres
+  #   depends_on:
+  #     - db
+
 volumes:
   db-pg-data:
+  static:
