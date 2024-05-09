@@ -42,3 +42,30 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "email"
+
+
+class Profile(models.Model):
+    """Model profile"""
+    about = models.TextField(null=True, blank=True)
+    office = models.CharField(max_length=255, null=True, blank=True)
+    photograph = models.ImageField(upload_to='profile/photograph/',
+                                   blank=True,
+                                   null=True,
+                                   )
+    curriculum = models.FileField(upload_to='profile/curriculum/')
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    class Meta:
+        """Meta definition for MODELNAME."""
+
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profiles'
+
+    def __str__(self):
+        return self.user.name
+
+    def name(self):
+        return self.user.name
+
+    def email(self):
+        return self.user.email
